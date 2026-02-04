@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN" monitorInterval="30">
+    <Properties>
+        <Property name="LOG_DIR">${sys:user.dir}/logs</Property>
+        <Property name="APP_LOG_PATTERN">%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n</Property>
+    </Properties>
+
+    <Appenders>
+        <!-- Console Appender - Only application logs -->
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="${APP_LOG_PATTERN}"/>
+            <!-- Deny all Appium and Selenium related logs -->
+            <RegexFilter regex=".*(?i)(appium|selenium|webdriver|uiautomator|chromedriver|geckodriver|safaridriver|appium.*driver|appium.*server|appium.*client|org\.openqa\.selenium|io\.appium|httpclient|okhttp|retrofit|okio|apache).*"
+                       onMatch="DENY"
+                       onMismatch="NEUTRAL"/>
+        </Console>
+
+        <!-- Application Log File -->
+        <RollingFile name="AppLogFile"
+                   fileName="${LOG_DIR}/application.log"
+                   filePattern="${LOG_DIR}/application-%d{yyyy-MM-dd}-%i.log">
+            <PatternLayout pattern="${APP_LOG_PATTERN}"/>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="10 MB"/>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+            </Policies>
+            <DefaultRolloverStrategy max="10">
+                <Delete basePath="${LOG_DIR}" maxDepth="1">
+                    <IfFileName glob="application-*.log" />
+                    <IfLastModified age="P7D" />
+                </Delete>
+            </DefaultRolloverStrategy>
+        </RollingFile>
+
+        <!-- Framework Log File -->
+        <RollingFile name="FrameworkLogFile"
+                   fileName="${LOG_DIR}/framework.log"
+                   filePattern="${LOG_DIR}/framework-%d{yyyy-MM-dd}-%i.log">
+            <PatternLayout pattern="${APP_LOG_PATTERN}"/>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="10 MB"/>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+            </Policies>
+            <DefaultRolloverStrategy max="10">
+                <Delete basePath="${LOG_DIR}" maxDepth="1">
+                    <IfFileName glob="framework-*.log" />
+                    <IfLastModified age="P7D" />
+                </Delete>
+            </DefaultRolloverStrategy>
+        </RollingFile>
+    </Appenders>
+
+    <Loggers>
+        <!-- Root Logger - Only application logs to console -->
+        <Root level="info">
+            <AppenderRef ref="Console" level="info"/>
+            <AppenderRef ref="AppLogFile" level="info"/>
+        </Root>
+
+        <!-- Framework Loggers - Only to file -->
+        <Logger name="io.appium" level="off" additivity="false">
+            <AppenderRef ref="FrameworkLogFile" level="info"/>
+        </Logger>
+
+        <Logger name="org.openqa.selenium" level="off" additivity="false">
+            <AppenderRef ref="FrameworkLogFile" level="info"/>
+        </Logger>
+
+        <Logger name="org.apache" level="off" additivity="false">
+            <AppenderRef ref="FrameworkLogFile" level="info"/>
+        </Logger>
+
+        <Logger name="okhttp3" level="off" additivity="false">
+            <AppenderRef ref="FrameworkLogFile" level="info"/>
+        </Logger>
+
+        <Logger name="io.appium.uiautomator2" level="off" additivity="false">
+            <AppenderRef ref="FrameworkLogFile" level="info"/>
+        </Logger>
+
+        <Logger name="org.openqa.selenium.remote" level="off" additivity="false">
+            <AppenderRef ref="FrameworkLogFile" level="info"/>
+        </Logger>
+
+        <Logger name="httpclient" level="off" additivity="false">
+            <AppenderRef ref="FrameworkLogFile" level="info"/>
+        </Logger>
+
+        <!-- Application Loggers -->
+        <Logger name="pages" level="info" additivity="false">
+            <AppenderRef ref="Console" level="info"/>
+            <AppenderRef ref="AppLogFile" level="info"/>
+        </Logger>
+
+        <Logger name="tests" level="info" additivity="false">
+            <AppenderRef ref="Console" level="info"/>
+            <AppenderRef ref="AppLogFile" level="info"/>
+        </Logger>
+
+        <Logger name="factory" level="info" additivity="false">
+            <AppenderRef ref="Console" level="info"/>
+            <AppenderRef ref="AppLogFile" level="info"/>
+        </Logger>
+    </Loggers>
+</Configuration>
